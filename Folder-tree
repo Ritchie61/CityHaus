@@ -1,0 +1,14 @@
+app/
+├── App.js                 # Entry point
+├── navigation/
+│   └── TabNavigator.js    # Bottom tabs for Guest / Host
+├── screens/
+│   ├── HomeScreen.js
+│   ├── ListingDetailScreen.js
+│   ├── AddSpaceScreen.js
+│   └── ProfileScreen.js
+├── components/
+│   ├── ListingCard.js
+│   └── ButtonPrimary.js
+└── constants/
+    └── theme.js           # Colors, font sizes
