@@ -92,18 +92,19 @@ export default function App() {
 const sampleListings = [
   {
     title: 'Modern Apartment',
+    type: 'Apartment',
     location: 'City Center',
     price: '$300 / month',
+    whatsapp: 'https://wa.me/67570000000',
+    facebook: 'https://facebook.com/profile.php?id=100000000',
   },
   {
     title: 'Single Room',
+    type: 'Room',
     location: 'Suburb Area',
     price: '$120 / month',
-  },
-  {
-    title: 'Family House',
-    location: 'Quiet Neighborhood',
-    price: '$500 / month',
+    whatsapp: 'https://wa.me/67571111111',
+    facebook: 'https://facebook.com/profile.php?id=100000001',
   },
 ];
 
