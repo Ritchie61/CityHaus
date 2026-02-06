@@ -8,81 +8,173 @@ import {
   TouchableOpacity,
   Linking,
 } from 'react-native';
+import { useState } from 'react';
 
 export default function App() {
+  const [screen, setScreen] = useState('home');
+
+  // Form state
+  const [form, setForm] = useState({
+    name: '',
+    phone: '',
+    type: '',
+    location: '',
+    price: '',
+    description: '',
+  });
+
+  const handleSubmit = () => {
+    console.log('Listing submitted:', form);
+    alert('Listing submitted successfully!');
+    setScreen('home');
+    setForm({
+      name: '',
+      phone: '',
+      type: '',
+      location: '',
+      price: '',
+      description: '',
+    });
+  };
+
+  // ================= HOME SCREEN =================
+  if (screen === 'home') {
+    return (
+      <ScrollView style={styles.container}>
+        <StatusBar style="dark" />
+
+        <View style={styles.header}>
+          <Text style={styles.logo}>🏠 CityHaus</Text>
+        </View>
+
+        <View style={styles.searchBox}>
+          <TextInput
+            placeholder="Search houses, rooms, spaces..."
+            style={styles.searchInput}
+          />
+        </View>
+
+        <View style={styles.hero}>
+          <Text style={styles.title}>Rent or list your space</Text>
+          <Text style={styles.subtitle}>
+            Find homes, rooms, or list your own space for rent
+          </Text>
+        </View>
+
+        <View style={styles.actions}>
+          <TouchableOpacity style={styles.primaryButton}>
+            <Text style={styles.primaryText}>View Listings</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.secondaryButton}
+            onPress={() => setScreen('list')}
+          >
+            <Text style={styles.secondaryText}>List Your Space</Text>
+          </TouchableOpacity>
+        </View>
+
+        <Text style={styles.sectionTitle}>Featured Listings</Text>
+
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          {sampleListings.map((item, index) => (
+            <View key={index} style={styles.card}>
+              <View style={styles.imagePlaceholder}>
+                <Text style={{ color: '#777' }}>Image</Text>
+              </View>
+
+              <Text style={styles.cardTitle}>{item.title}</Text>
+              <Text style={styles.cardType}>{item.type}</Text>
+              <Text style={styles.cardLocation}>{item.location}</Text>
+              <Text style={styles.cardPrice}>{item.price}</Text>
+
+              <View style={styles.cardButtons}>
+                <TouchableOpacity
+                  style={[styles.contactButton, styles.whatsapp]}
+                  onPress={() => Linking.openURL(item.whatsapp)}
+                >
+                  <Text style={styles.contactBtnText}>WhatsApp</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.contactButton, styles.facebook]}
+                  onPress={() => Linking.openURL(item.facebook)}
+                >
+                  <Text style={styles.contactBtnText}>Facebook</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </ScrollView>
+      </ScrollView>
+    );
+  }
+
+  // ================= LIST SPACE SCREEN =================
   return (
     <ScrollView style={styles.container}>
       <StatusBar style="dark" />
 
-      {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.logo}>🏠 CityHaus</Text>
+        <Text style={styles.logo}>List Your Space</Text>
       </View>
 
-      {/* Search */}
-      <View style={styles.searchBox}>
+      <View style={styles.form}>
         <TextInput
-          placeholder="Search houses, rooms, spaces..."
-          style={styles.searchInput}
+          placeholder="Full Name"
+          style={styles.input}
+          value={form.name}
+          onChangeText={(text) => setForm({ ...form, name: text })}
         />
-      </View>
 
-      {/* Hero Text */}
-      <View style={styles.hero}>
-        <Text style={styles.title}>Rent or list your space</Text>
-        <Text style={styles.subtitle}>
-          Find homes, rooms, or list your own space for rent
-        </Text>
-      </View>
+        <TextInput
+          placeholder="Phone (WhatsApp)"
+          style={styles.input}
+          keyboardType="phone-pad"
+          value={form.phone}
+          onChangeText={(text) => setForm({ ...form, phone: text })}
+        />
 
-      {/* Action Buttons */}
-      <View style={styles.actions}>
-        <TouchableOpacity style={styles.primaryButton}>
-          <Text style={styles.primaryText}>View Listings</Text>
+        <TextInput
+          placeholder="Type (Room / House / Space)"
+          style={styles.input}
+          value={form.type}
+          onChangeText={(text) => setForm({ ...form, type: text })}
+        />
+
+        <TextInput
+          placeholder="Location / Address"
+          style={styles.input}
+          value={form.location}
+          onChangeText={(text) => setForm({ ...form, location: text })}
+        />
+
+        <TextInput
+          placeholder="Price (e.g. $200 / month)"
+          style={styles.input}
+          value={form.price}
+          onChangeText={(text) => setForm({ ...form, price: text })}
+        />
+
+        <TextInput
+          placeholder="Description"
+          style={[styles.input, { height: 100 }]}
+          multiline
+          value={form.description}
+          onChangeText={(text) => setForm({ ...form, description: text })}
+        />
+
+        <TouchableOpacity style={styles.primaryButton} onPress={handleSubmit}>
+          <Text style={styles.primaryText}>Submit Listing</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.secondaryButton}>
-          <Text style={styles.secondaryText}>List Your Space</Text>
+        <TouchableOpacity
+          style={{ marginTop: 15, alignItems: 'center' }}
+          onPress={() => setScreen('home')}
+        >
+          <Text style={{ color: '#555' }}>← Back to Home</Text>
         </TouchableOpacity>
       </View>
-
-      {/* Featured Listings */}
-      <Text style={styles.sectionTitle}>Featured Listings</Text>
-
-      <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-        {sampleListings.map((item, index) => (
-          <View key={index} style={styles.card}>
-
-            {/* Image Placeholder */}
-            <View style={styles.imagePlaceholder}>
-              <Text style={{ color: '#777' }}>Image</Text>
-            </View>
-
-            <Text style={styles.cardTitle}>{item.title}</Text>
-            <Text style={styles.cardType}>{item.type}</Text>
-            <Text style={styles.cardLocation}>{item.location}</Text>
-            <Text style={styles.cardPrice}>{item.price}</Text>
-
-            {/* Contact Buttons */}
-            <View style={styles.cardButtons}>
-              <TouchableOpacity
-                style={[styles.contactButton, styles.whatsapp]}
-                onPress={() => Linking.openURL(item.whatsapp)}
-              >
-                <Text style={styles.contactBtnText}>WhatsApp</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                style={[styles.contactButton, styles.facebook]}
-                onPress={() => Linking.openURL(item.facebook)}
-              >
-                <Text style={styles.contactBtnText}>Facebook</Text>
-              </TouchableOpacity>
-            </View>
-
-          </View>
-        ))}
-      </ScrollView>
     </ScrollView>
   );
 }
@@ -94,7 +186,7 @@ const sampleListings = [
     location: 'City Center',
     price: '$300 / month',
     whatsapp: 'https://wa.me/67570000000',
-    facebook: 'https://facebook.com/profile.php?id=100000000',
+    facebook: 'https://facebook.com',
   },
   {
     title: 'Single Room',
@@ -102,45 +194,23 @@ const sampleListings = [
     location: 'Suburb Area',
     price: '$120 / month',
     whatsapp: 'https://wa.me/67571111111',
-    facebook: 'https://facebook.com/profile.php?id=100000001',
+    facebook: 'https://facebook.com',
   },
 ];
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f9f9f9',
-  },
-  header: {
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  logo: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  searchBox: {
-    padding: 16,
-  },
+  container: { flex: 1, backgroundColor: '#f9f9f9' },
+  header: { padding: 20, backgroundColor: '#fff' },
+  logo: { fontSize: 24, fontWeight: 'bold' },
+  searchBox: { padding: 16 },
   searchInput: {
     backgroundColor: '#fff',
     padding: 14,
     borderRadius: 10,
-    fontSize: 16,
   },
-  hero: {
-    paddingHorizontal: 16,
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 26,
-    fontWeight: 'bold',
-  },
-  subtitle: {
-    fontSize: 15,
-    color: '#666',
-    marginTop: 6,
-  },
+  hero: { paddingHorizontal: 16, marginBottom: 16 },
+  title: { fontSize: 26, fontWeight: 'bold' },
+  subtitle: { fontSize: 15, color: '#666', marginTop: 6 },
   actions: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -151,24 +221,17 @@ const styles = StyleSheet.create({
     backgroundColor: '#ff8c42',
     padding: 14,
     borderRadius: 10,
-    width: '48%',
     alignItems: 'center',
   },
   secondaryButton: {
     backgroundColor: '#2ec4b6',
     padding: 14,
     borderRadius: 10,
-    width: '48%',
     alignItems: 'center',
+    width: '48%',
   },
-  primaryText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  secondaryText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
+  primaryText: { color: '#fff', fontWeight: 'bold' },
+  secondaryText: { color: '#fff', fontWeight: 'bold' },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
@@ -183,34 +246,17 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   imagePlaceholder: {
-    width: '100%',
     height: 120,
     backgroundColor: '#eaeaea',
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
   },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    paddingHorizontal: 10,
-    marginTop: 8,
-  },
-  cardType: {
-    paddingHorizontal: 10,
-    color: '#555',
-    fontSize: 13,
-  },
-  cardLocation: {
-    paddingHorizontal: 10,
-    color: '#777',
-  },
-  cardPrice: {
-    paddingHorizontal: 10,
-    fontWeight: 'bold',
-    marginTop: 4,
-  },
+  cardTitle: { fontWeight: 'bold', paddingHorizontal: 10, marginTop: 6 },
+  cardType: { paddingHorizontal: 10, color: '#555' },
+  cardLocation: { paddingHorizontal: 10, color: '#777' },
+  cardPrice: { paddingHorizontal: 10, fontWeight: 'bold' },
   cardButtons: {
     flexDirection: 'row',
     paddingHorizontal: 10,
@@ -223,15 +269,14 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: 'center',
   },
-  whatsapp: {
-    backgroundColor: '#25D366',
-  },
-  facebook: {
-    backgroundColor: '#1877F2',
-  },
-  contactBtnText: {
-    color: '#fff',
-    fontWeight: 'bold',
-    fontSize: 13,
+  whatsapp: { backgroundColor: '#25D366' },
+  facebook: { backgroundColor: '#1877F2' },
+  contactBtnText: { color: '#fff', fontWeight: 'bold' },
+  form: { padding: 16 },
+  input: {
+    backgroundColor: '#fff',
+    padding: 14,
+    borderRadius: 10,
+    marginBottom: 12,
   },
 });
