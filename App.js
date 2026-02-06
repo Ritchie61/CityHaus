@@ -5,20 +5,11 @@ import {
   View,
   TextInput,
   ScrollView,
-  Image,
   TouchableOpacity,
   Linking,
 } from 'react-native';
 
 export default function App() {
-  const openWhatsApp = () => {
-    Linking.openURL('https://wa.me/1234567890');
-  };
-
-  const openFacebook = () => {
-    Linking.openURL('https://facebook.com');
-  };
-
   return (
     <ScrollView style={styles.container}>
       <StatusBar style="dark" />
@@ -61,30 +52,37 @@ export default function App() {
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {sampleListings.map((item, index) => (
           <View key={index} style={styles.card}>
-            <Image source={require('./assets/placeholder.jpeg')} style={styles.image} />
+
+            {/* Image Placeholder */}
+            <View style={styles.imagePlaceholder}>
+              <Text style={{ color: '#777' }}>Image</Text>
+            </View>
+
             <Text style={styles.cardTitle}>{item.title}</Text>
+            <Text style={styles.cardType}>{item.type}</Text>
             <Text style={styles.cardLocation}>{item.location}</Text>
             <Text style={styles.cardPrice}>{item.price}</Text>
+
+            {/* Contact Buttons */}
+            <View style={styles.cardButtons}>
+              <TouchableOpacity
+                style={[styles.contactButton, styles.whatsapp]}
+                onPress={() => Linking.openURL(item.whatsapp)}
+              >
+                <Text style={styles.contactBtnText}>WhatsApp</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.contactButton, styles.facebook]}
+                onPress={() => Linking.openURL(item.facebook)}
+              >
+                <Text style={styles.contactBtnText}>Facebook</Text>
+              </TouchableOpacity>
+            </View>
+
           </View>
         ))}
       </ScrollView>
-
-      {/* Contact Section */}
-      <View style={styles.contact}>
-        <Text style={styles.contactText}>
-          Contact property owners via:
-        </Text>
-
-        <View style={styles.contactButtons}>
-          <TouchableOpacity style={styles.whatsapp} onPress={openWhatsApp}>
-            <Text style={styles.contactBtnText}>WhatsApp</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.facebook} onPress={openFacebook}>
-            <Text style={styles.contactBtnText}>Facebook</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
     </ScrollView>
   );
 }
@@ -179,21 +177,30 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#fff',
-    width: 220,
+    width: 230,
     marginLeft: 16,
     borderRadius: 12,
-    overflow: 'hidden',
     paddingBottom: 12,
   },
-  image: {
+  imagePlaceholder: {
     width: '100%',
     height: 120,
+    backgroundColor: '#eaeaea',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
   },
   cardTitle: {
     fontSize: 16,
     fontWeight: 'bold',
     paddingHorizontal: 10,
-    marginTop: 6,
+    marginTop: 8,
+  },
+  cardType: {
+    paddingHorizontal: 10,
+    color: '#555',
+    fontSize: 13,
   },
   cardLocation: {
     paddingHorizontal: 10,
@@ -204,31 +211,27 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 4,
   },
-  contact: {
-    marginTop: 30,
-    padding: 16,
-    backgroundColor: '#fff',
-  },
-  contactText: {
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  contactButtons: {
+  cardButtons: {
     flexDirection: 'row',
+    paddingHorizontal: 10,
+    marginTop: 10,
+    gap: 8,
+  },
+  contactButton: {
+    flex: 1,
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
   },
   whatsapp: {
     backgroundColor: '#25D366',
-    padding: 12,
-    borderRadius: 10,
-    marginRight: 10,
   },
   facebook: {
     backgroundColor: '#1877F2',
-    padding: 12,
-    borderRadius: 10,
   },
   contactBtnText: {
     color: '#fff',
     fontWeight: 'bold',
+    fontSize: 13,
   },
 });
