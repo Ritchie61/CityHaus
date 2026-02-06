@@ -61,7 +61,7 @@ export default function App() {
       <ScrollView horizontal showsHorizontalScrollIndicator={false}>
         {sampleListings.map((item, index) => (
           <View key={index} style={styles.card}>
-            <Image source={require('./assets/placeholder.jpg')} style={styles.image} />
+            <Image source={require('./assets/placeholder.jpeg')} style={styles.image} />
             <Text style={styles.cardTitle}>{item.title}</Text>
             <Text style={styles.cardLocation}>{item.location}</Text>
             <Text style={styles.cardPrice}>{item.price}</Text>
