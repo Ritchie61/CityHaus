@@ -6,9 +6,11 @@ import {
   TextInput,
   ScrollView,
   TouchableOpacity,
+  Image,
   Linking,
 } from 'react-native';
 import { useState } from 'react';
+import * as ImagePicker from 'expo-image-picker';
 
 export default function App() {
   const [screen, setScreen] = useState('home');
@@ -16,11 +18,13 @@ export default function App() {
   // Form state
   const [form, setForm] = useState({
     name: '',
-    phone: '',
+    whatsapp: '',
+    facebook: '',
     type: '',
     location: '',
     price: '',
     description: '',
+    photo: null,
   });
 
   const handleSubmit = () => {
@@ -29,12 +33,31 @@ export default function App() {
     setScreen('home');
     setForm({
       name: '',
-      phone: '',
+      whatsapp: '',
+      facebook: '',
       type: '',
       location: '',
       price: '',
       description: '',
+      photo: null,
     });
+  };
+
+  const pickImage = async () => {
+    const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (!permissionResult.granted) {
+      alert('Permission to access gallery is required!');
+      return;
+    }
+
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.7,
+    });
+
+    if (!result.canceled) {
+      setForm({ ...form, photo: result.assets[0].uri });
+    }
   };
 
   // ================= HOME SCREEN =================
@@ -128,11 +151,18 @@ export default function App() {
         />
 
         <TextInput
-          placeholder="Phone (WhatsApp)"
+          placeholder="WhatsApp Number"
           style={styles.input}
           keyboardType="phone-pad"
-          value={form.phone}
-          onChangeText={(text) => setForm({ ...form, phone: text })}
+          value={form.whatsapp}
+          onChangeText={(text) => setForm({ ...form, whatsapp: `https://wa.me/${text}` })}
+        />
+
+        <TextInput
+          placeholder="Facebook Profile Link"
+          style={styles.input}
+          value={form.facebook}
+          onChangeText={(text) => setForm({ ...form, facebook: text })}
         />
 
         <TextInput
@@ -163,6 +193,19 @@ export default function App() {
           value={form.description}
           onChangeText={(text) => setForm({ ...form, description: text })}
         />
+
+        {/* Photo Picker */}
+        <TouchableOpacity style={styles.photoButton} onPress={pickImage}>
+          <Text style={{ color: '#fff', fontWeight: 'bold' }}>
+            {form.photo ? 'Change Photo' : 'Upload Photo'}
+          </Text>
+        </TouchableOpacity>
+        {form.photo && (
+          <Image
+            source={{ uri: form.photo }}
+            style={{ width: '100%', height: 200, marginTop: 10, borderRadius: 10 }}
+          />
+        )}
 
         <TouchableOpacity style={styles.primaryButton} onPress={handleSubmit}>
           <Text style={styles.primaryText}>Submit Listing</Text>
@@ -203,11 +246,7 @@ const styles = StyleSheet.create({
   header: { padding: 20, backgroundColor: '#fff' },
   logo: { fontSize: 24, fontWeight: 'bold' },
   searchBox: { padding: 16 },
-  searchInput: {
-    backgroundColor: '#fff',
-    padding: 14,
-    borderRadius: 10,
-  },
+  searchInput: { backgroundColor: '#fff', padding: 14, borderRadius: 10 },
   hero: { paddingHorizontal: 16, marginBottom: 16 },
   title: { fontSize: 26, fontWeight: 'bold' },
   subtitle: { fontSize: 15, color: '#666', marginTop: 6 },
@@ -257,12 +296,7 @@ const styles = StyleSheet.create({
   cardType: { paddingHorizontal: 10, color: '#555' },
   cardLocation: { paddingHorizontal: 10, color: '#777' },
   cardPrice: { paddingHorizontal: 10, fontWeight: 'bold' },
-  cardButtons: {
-    flexDirection: 'row',
-    paddingHorizontal: 10,
-    marginTop: 10,
-    gap: 8,
-  },
+  cardButtons: { flexDirection: 'row', paddingHorizontal: 10, marginTop: 10, gap: 8 },
   contactButton: {
     flex: 1,
     paddingVertical: 10,
@@ -278,5 +312,12 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 10,
     marginBottom: 12,
+  },
+  photoButton: {
+    backgroundColor: '#2ec4b6',
+    padding: 14,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 8,
   },
 });
