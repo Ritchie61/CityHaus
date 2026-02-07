@@ -11,9 +11,11 @@ import {
 } from 'react-native';
 import { useState } from 'react';
 import * as ImagePicker from 'expo-image-picker';
+import { MaterialIcons } from '@expo/vector-icons'; // Hamburger icon
 
 export default function App() {
   const [screen, setScreen] = useState('home');
+  const [menuVisible, setMenuVisible] = useState(false); // Hamburger menu state
 
   // Form state
   const [form, setForm] = useState({
@@ -60,6 +62,12 @@ export default function App() {
     }
   };
 
+  const toggleMenu = () => setMenuVisible(!menuVisible);
+  const handleMenuItemPress = (item) => {
+    setMenuVisible(false);
+    console.log('Selected menu item:', item);
+  };
+
   // ================= HOME SCREEN =================
   if (screen === 'home') {
     return (
@@ -68,6 +76,25 @@ export default function App() {
 
         <View style={styles.header}>
           <Text style={styles.logo}>🏠 CityHaus</Text>
+
+          {/* Hamburger Menu */}
+          <TouchableOpacity onPress={toggleMenu} style={styles.menuIcon}>
+            <MaterialIcons name="menu" size={28} color="black" />
+          </TouchableOpacity>
+
+          {menuVisible && (
+            <View style={styles.dropdown}>
+              {['About Us', 'Become a Partner', 'Advertise with Us'].map((item, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => handleMenuItemPress(item)}
+                  style={styles.dropdownItem}
+                >
+                  <Text style={styles.dropdownText}>{item}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
 
         <View style={styles.searchBox}>
@@ -243,8 +270,24 @@ const sampleListings = [
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f9f9f9' },
-  header: { padding: 20, backgroundColor: '#fff' },
+  header: { padding: 20, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   logo: { fontSize: 24, fontWeight: 'bold' },
+  menuIcon: { padding: 8 },
+  dropdown: {
+    position: 'absolute',
+    top: 60,
+    right: 20,
+    backgroundColor: '#fff',
+    borderRadius: 8,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    zIndex: 100,
+  },
+  dropdownItem: { padding: 12, borderBottomWidth: 0.5, borderBottomColor: '#ccc' },
+  dropdownText: { fontSize: 16 },
   searchBox: { padding: 16 },
   searchInput: { backgroundColor: '#fff', padding: 14, borderRadius: 10 },
   hero: { paddingHorizontal: 16, marginBottom: 16 },
