@@ -66,7 +66,37 @@ export default function App() {
   const handleMenuItemPress = (item) => {
     setMenuVisible(false);
     console.log('Selected menu item:', item);
+    alert(`${item} page coming soon!`);
   };
+
+  // ========================= FOOTER COMPONENT =========================
+  const Footer = () => (
+    <View style={styles.footer}>
+      <Text style={styles.footerText}>© 2026 CityHaus | Built by Mavos Smart Solutions</Text>
+
+      <View style={styles.footerButtons}>
+        <TouchableOpacity
+          style={[styles.contactButton, styles.whatsapp]}
+          onPress={() => Linking.openURL('https://wa.me/67570000000')}
+        >
+          <Text style={styles.contactBtnText}>WhatsApp</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[styles.contactButton, styles.facebook]}
+          onPress={() => Linking.openURL('https://facebook.com')}
+        >
+          <Text style={styles.contactBtnText}>Facebook</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={() => alert('About Us page coming soon!')}>
+          <Text style={[styles.contactBtnText, { backgroundColor: 'transparent', padding: 0, marginLeft: 10 }]}>
+            About Us
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
 
   // ================= HOME SCREEN =================
   if (screen === 'home') {
@@ -156,6 +186,9 @@ export default function App() {
             </View>
           ))}
         </ScrollView>
+
+        {/* FOOTER */}
+        <Footer />
       </ScrollView>
     );
   }
@@ -245,6 +278,9 @@ export default function App() {
           <Text style={{ color: '#555' }}>← Back to Home</Text>
         </TouchableOpacity>
       </View>
+
+      {/* FOOTER */}
+      <Footer />
     </ScrollView>
   );
 }
@@ -362,5 +398,25 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     marginTop: 8,
+  },
+  // ================= FOOTER STYLES =================
+  footer: {
+    padding: 12,
+    backgroundColor: '#fff',
+    borderTopWidth: 1,
+    borderColor: '#e0e0e0',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  footerText: {
+    fontSize: 12,
+    color: '#555',
+    textAlign: 'center',
+    marginBottom: 6,
+  },
+  footerButtons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
