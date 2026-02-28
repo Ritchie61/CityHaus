@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>CityHaus - Find Your Stay in PNG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background: #f3f4f6;
+            overflow-x: hidden;
+        }
+        
+        .mobile-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.1);
+        }
+        
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        .slide-up {
+            animation: slideUp 0.3s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .scale-in {
+            animation: scaleIn 0.2s ease-out;
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            max-width: 480px;
+            background: white;
+            border-top: 1px solid #e5e7eb;
+            z-index: 50;
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        
+        .listing-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .listing-card:active {
+            transform: scale(0.98);
+        }
+        
+        .chip {
+            transition: all 0.2s;
+        }
+        
+        .chip.active {
+            background: #059669;
+            color: white;
+        }
+        
+        .image-upload-area {
+            border: 2px dashed #d1d5db;
+            transition: all 0.3s;
+        }
+        
+        .image-upload-area.dragover {
+            border-color: #059669;
+            background: #ecfdf5;
+        }
+        
+        .modal-overlay {
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+        }
+        
+        /* Custom colors based on PNG nature */
+        .bg-png-green { background-color: #059669; }
+        .text-png-green { color: #059669; }
+        .border-png-green { border-color: #059669; }
+        
+        .safe-area-top {
+            padding-top: env(safe-area-inset-top);
+        }
+        
+        .content-pb {
+            padding-bottom: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="mobile-container">
+        <!-- Content injected by JavaScript -->
+    </div>
+
+    <script>
+        // Data Store
+        const store = {
+            currentUser: null,
+            userRole: 'guest', // 'guest' or 'host'
+            listings: [
+                {
+                    id: 1,
+                    title: "Modern Apartment in Port Moresby",
+                    type: "Apartment",
+                    price: 350,
+                    location: "Waigani, Port Moresby",
+                    image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&auto=format&fit=crop",
+                    host: "Sarah K.",
+                    phone: "+675 7123 4567",
+                    whatsapp: "+67571234567",
+                    rating: 4.8,
+                    reviews: 12,
+                    amenities: ["WiFi", "AC", "Kitchen", "Parking"],
+                    description: "Beautiful modern apartment in the heart of Waigani. Perfect for business travelers or tourists. Close to shopping centers and restaurants.",
+                    beds: 2,
+                    baths: 1,
+                    guests: 4,
+                    available: true
+                },
+                {
+                    id: 2,
+                    title: "Traditional Lodge - Goroka",
+                    type: "Lodge",
+                    price: 180,
+                    location: "Goroka, Eastern Highlands",
+                    image: "https://images.unsplash.com/photo-1587061949409-02df41d5e562?w=800&auto=format&fit=crop",
+                    host: "John M.",
+                    phone: "+675 7234 5678",
+                    whatsapp: "+67572345678",
+                    rating: 4.9,
+                    reviews: 8,
+                    amenities: ["Garden", "Traditional Meals", "Mountain View"],
+                    description: "Experience authentic Highland culture in our traditional lodge. Stunning mountain views and home-cooked meals included.",
+                    beds: 3,
+                    baths: 2,
+                    guests: 6,
+                    available: true
+                },
+                {
+                    id: 3,
+                    title: "Beachfront Home - Madang",
+                    type: "Home",
+                    price: 450,
+                    location: "Madang Coast",
+                    image: "https://images.unsplash.com/photo-1499793983690-e29da59ef1c2?w=800&auto=format&fit=crop",
+                    host: "Lisa T.",
+                    phone: "+675 7345 6789",
+                    whatsapp: "+67573456789",
+                    rating: 4.7,
+                    reviews: 15,
+                    amenities: ["Beach Access", "BBQ", "Kayak", "WiFi"],
+                    description: "Stunning beachfront property with direct ocean access. Perfect for families or groups looking for a tropical getaway.",
+                    beds: 4,
+                    baths: 2,
+                    guests: 8,
+                    available: true
+                },
+                {
+                    id: 4,
+                    title: "Budget Room - Lae",
+                    type: "Home",
+                    price: 120,
+                    location: "Lae City",
+                    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&auto=format&fit=crop",
+                    host: "Michael R.",
+                    phone: "+675 7456 7890",
+                    whatsapp: "+67574567890",
+                    rating: 4.5,
+                    reviews: 20,
+                    amenities: ["Fan", "Shared Kitchen", "Security"],
+                    description: "Clean and secure budget accommodation in Lae. Ideal for transit stays or budget travelers.",
+                    beds: 1,
+                    baths: 1,
+                    guests: 2,
+                    available: true
+                },
+                {
+                    id: 5,
+                    title: "Highlands Inn - Mt Hagen",
+                    type: "Inn",
+                    price: 280,
+                    location: "Mt Hagen",
+                    image: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop",
+                    host: "Anna W.",
+                    phone: "+675 7567 8901",
+                    whatsapp: "+67575678901",
+                    rating: 4.6,
+                    reviews: 10,
+                    amenities: ["Restaurant", "Bar", "Laundry", "WiFi"],
+                    description: "Comfortable inn in the heart of Mt Hagen. Walking distance to markets and cultural shows.",
+                    beds: 2,
+                    baths: 1,
+                    guests: 3,
+                    available: true
+                }
+            ],
+            myListings: [],
+            filters: {
+                type: 'All',
+                maxPrice: 1000,
+                location: ''
+            },
+            currentScreen: 'home',
+            selectedListing: null
+        };
+
+        // Utility Functions
+        const formatPrice = (price) => `K${price}/night`;
+        
+        const getAmenityIcon = (amenity) => {
+            const icons = {
+                'WiFi': 'fa-wifi',
+                'AC': 'fa-snowflake',
+                'Kitchen': 'fa-utensils',
+                'Parking': 'fa-car',
+                'Garden': 'fa-tree',
+                'Pool': 'fa-swimming-pool',
+                'Beach Access': 'fa-umbrella-beach',
+                'BBQ': 'fa-fire',
+                'Kayak': 'fa-ship',
+                'Fan': 'fa-fan',
+                'Security': 'fa-shield-alt',
+                'Restaurant': 'fa-utensils',
+                'Bar': 'fa-glass-cheers',
+                'Laundry': 'fa-tshirt',
+                'Mountain View': 'fa-mountain',
+                'Traditional Meals': 'fa-drumstick-bite'
+            };
+            return icons[amenity] || 'fa-check';
+        };
+
+        const getTypeIcon = (type) => {
+            const icons = {
+                'Home': 'fa-home',
+                'Apartment': 'fa-building',
+                'Lodge': 'fa-campground',
+                'Inn': 'fa-bed',
+                'Other': 'fa-house-user'
+            };
+            return icons[type] || 'fa-home';
+        };
+
+        // Components
+        const Components = {
+            BottomNav: () => {
+                const isGuest = store.userRole === 'guest';
+                const items = isGuest ? [
+                    { id: 'home', icon: 'fa-search', label: 'Browse' },
+                    { id: 'saved', icon: 'fa-heart', label: 'Saved' },
+                    { id: 'trips', icon: 'fa-suitcase', label: 'Trips' },
+                    { id: 'profile', icon: 'fa-user', label: 'Profile' }
+                ] : [
+                    { id: 'home', icon: 'fa-list', label: 'My Listings' },
+                    { id: 'add', icon: 'fa-plus-circle', label: 'Add Space' },
+                    { id: 'analytics', icon: 'fa-chart-line', label: 'Stats' },
+                    { id: 'profile', icon: 'fa-user', label: 'Profile' }
+                ];
+
+                return `
+                    <nav class="bottom-nav flex justify-around items-center py-3 px-4">
+                        ${items.map(item => `
+                            <button onclick="navigateTo('${item.id}')" 
+                                    class="flex flex-col items-center gap-1 ${store.currentScreen === item.id ? 'text-emerald-600' : 'text-gray-400'} transition-colors">
+                                <i class="fas ${item.icon} text-xl"></i>
+                                <span class="text-xs font-medium">${item.label}</span>
+                            </button>
+                        `).join('')}
+                    </nav>
+                `;
+            },
+
+            Header: (title, showBack = false, rightAction = null) => `
+                <header class="sticky top-0 z-40 bg-white border-b border-gray-gray-100 safe-area-top">
+                    <div class="flex items-center justify-between px-4 py-4">
+                        ${showBack ? `
+                            <button onclick="goBack()" class="p-2 -ml-2 text-gray-600 hover:text-emerald-600 transition-colors">
+                                <i class="fas fa-arrow-left text-xl"></i>
+                            </button>
+                        ` : '<div class="w-10"></div>'}
+                        
+                        <h1 class="text-lg font-bold text-gray-800">${title}</h1>
+                        
+                        ${rightAction ? rightAction : '<div class="w-10"></div>'}
+                    </div>
+                </header>
+            `,
+
+            ListingCard: (listing) => `
+                <div class="listing-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-4 cursor-pointer" 
+                     onclick="viewListing(${listing.id})">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="${listing.image}" alt="${listing.title}" class="w-full h-full object-cover">
+                        <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-semibold text-gray-700">
+                            <i class="fas ${getTypeIcon(listing.type)} mr-1"></i>
+                            ${listing.type}
+                        </div>
+                        <button onclick="event.stopPropagation(); toggleSave(${listing.id})" class="absolute top-3 left-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-gray-800 line-clamp-1 flex-1 mr-2">${listing.title}</h3>
+                            <div class="flex items-center gap-1 text-sm">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="font-medium">${listing.rating}</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-3 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-1 text-gray-400"></i>
+                            ${listing.location}
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-lg font-bold text-emerald-600">${formatPrice(listing.price)}</span>
+                                <span class="text-gray-400 text-sm">/ night</span>
+                            </div>
+                            <div-100 safe-area-top">
+                    <div class="flex items-center justify-between px-4 py-4">
+                        ${showBack ? `
+                            <button onclick="goBack()" class="p-2 -ml-2 text-gray-600 hover:text-emerald-600 transition-colors">
+                                <i class="fas fa-arrow-left text-xl"></i>
+                            </button>
+                        ` : '<div class="w-10"></div>'}
+                        
+                        <h1 class="text-lg font-bold text-gray-800">${title}</h1>
+                        
+                        ${rightAction ? rightAction : '<div class="w-10"></div>'}
+                    </div>
+                </header>
+            `,
+
+            ListingCard: (listing) => `
+                <div class="listing-card bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-4 cursor-pointer" 
+                     onclick="viewListing(${listing.id})">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="${listing.image}" alt="${listing.title}" class="w-full h-full object-cover">
+                        <div class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-lg text-xs font-semibold text-gray-700">
+                            <i class="fas ${getTypeIcon(listing.type)} mr-1"></i>
+                            ${listing.type}
+                        </div>
+                        <button onclick="event.stopPropagation(); toggleSave(${listing.id})" class="absolute top-3 left-3 w-8 h-8 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 transition-colors">
+                            <i class="far fa-heart"></i>
+                        </button>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-semibold text-gray-800 line-clamp-1 flex-1 mr-2">${listing.title}</h3>
+                            <div class="flex items-center gap-1 text-sm">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="font-medium">${listing.rating}</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-3 flex items-center">
+                            <i class="fas fa-map-marker-alt mr-1 text-gray-400"></i>
+                            ${listing.location}
+                        </p>
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-lg font-bold text-emerald-600">${formatPrice(listing.price)}</span>
+                                <span class="text-gray-400 text-sm">/ night</span>
+                            </div>
+                            <div class="flex gap-2 text-gray-400 text-sm">
+                                <span class="flex items-center gap-1">
+                                    <i class="fas fa-user-friends"></i> ${listing.guests}
+                                </span>
+                                <span class="flex items-center gap-1">
+                                    <i class="fas fa-bed"></i> ${listing.beds}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+
+            FilterChip: (label, active, onClick) => `
+                <button onclick="${onClick}" 
+                        class="chip px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap ${active ? 'active' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
+                    ${label}
+                </button>
+            `,
+
+            AmenityTag: (amenity) => `
+                <span class="inline-flex items-center gap-1 px-3 py-1.5 bg-gray-50 rounded-lg text-sm text-gray-600 border border-gray-100">
+                    <i class="fas ${getAmenityIcon(amenity)} text-emerald-600"></i>
+                    ${amenity}
+                </span>
+            `
+        };
+
+        // Screen Renderers
+        const Screens = {
+            home: () => {
+                const filteredListings = store.listings.filter(l => {
+                    if (store.filters.type !== 'All' && l.type !== store.filters.type) return false;
+                    if (l.price > store.filters.maxPrice) return false;
+                    if (store.filters.location && !l.location.toLowerCase().includes(store.filters.location.toLowerCase())) return false;
+                    return true;
+                });
+
+                const types = ['All', 'Home', 'Apartment', 'Lodge', 'Inn', 'Other'];
+
+                return `
+                    ${Components.Header('CityHaus', false, `
+                        <button onclick="toggleRole()" class="text-xs bg-emerald-100 text-emerald-700 px-3 py-1.5 rounded-full font-medium">
+                            ${store.userRole === 'guest' ? 'Guest' : 'Host'}
+                        </button>
+                    `)}
+                    
+                    <div class="px-4 py-4 content-pb">
+                        <!-- Search -->
+                        <div class="relative mb-4">
+                            <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="text" 
+                                   placeholder="Where in PNG?" 
+                                   class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white transition-all"
+                                   oninput="store.filters.location = this.value; render();">
+                        </div>
+
+                        <!-- Filters -->
+                        <div class="flex gap-2 overflow-x-auto hide-scrollbar mb-6 pb-2">
+                            ${types.map(type => Components.FilterChip(
+                                type === 'All' ? 'All Types' : `<i class="fas ${getTypeIcon(type)} mr-1"></i>${type}`, 
+                                store.filters.type === type,
+                                `setFilter('type', '${type}')`
+                            )).join('')}
+                        </div>
+
+                        <!-- Price Range -->
+                        <div class="mb-6">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-gray-700">Max Price: K${store.filters.maxPrice}</span>
+                            </div>
+                            <input type="range" min="100" max="1000" step="50" value="${store.filters.maxPrice}"
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-emerald-600"
+                                   oninput="store.filters.maxPrice = parseInt(this.value); render();">
+                        </div>
+
+                        <!-- Results -->
+                        <div class="space-y-4">
+                            ${filteredListings.length === 0 ? `
+                                <div class="text-center py-12 text-gray-400">
+                                    <i class="fas fa-search text-4xl mb-3"></i>
+                                    <p>No listings found</p>
+                                </div>
+                            ` : filteredListings.map(listing => Components.ListingCard(listing)).join('')}
+                        </div>
+                    </div>
+                    
+                    ${Components.BottomNav()}
+                `;
+            },
+
+            listingDetail: () => {
+                const l = store.selectedListing;
+                if (!l) return Screens.home();
+
+                return `
+                    ${Components.Header('Listing Details', true, `
+                        <button onclick="toggleSave(${l.id})" class="p-2 -mr-2 text-gray-600 hover:text-red-500 transition-colors">
+                            <i class="far fa-heart text-xl"></i>
+                        </button>
+                    `)}
+                    
+                    <div class="content-pb">
+                        <div class="relative h-72">
+                            <img src="${l.image}" class="w-full h-full object-cover">
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-6">
+                                <span class="inline-block px-3 py-1 bg-emerald-500 text-white text-xs font-bold rounded-full mb-2">
+                                    ${l.type}
+                                </span>
+                                <h1 class="text-2xl font-bold text-white mb-1">${l.title}</h1>
+                                <p class="text-white/90 flex items-center gap-1">
+                                    <i class="fas fa-map-marker-alt"></i> ${l.location}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="p-5 space-y-6">
+                            <!-- Host & Price -->
+                            <div class="flex items-center justify-between pb-6 border-b border-gray-100">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-700 font-bold text-lg">
+                                        ${l.host.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p class="font-semibold text-gray-800">Hosted by ${l.host}</p>
+                                        <div class="flex items-center gap-1 text-sm text-gray-500">
+                                            <i class="fas fa-star text-yellow-400"></i>
+                                            <span class="font-medium text-gray-700">${l.rating}</span>
+                                            <span>(${l.reviews} reviews)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <p class="text-2xl font-bold text-emerald-600">K${l.price}</p>
+                                    <p class="text-sm text-gray-400">per night</p>
+                                </div>
+                            </div>
+
+                            <!-- Specs -->
+                            <div class="flex justify-around py-2">
+                                <div class="text-center">
+                                    <i class="fas fa-user-friends text-emerald-600 text-xl mb-1"></i>
+                                    <p class="text-sm font-medium text-gray-700">${l.guests} guests</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fas fa-bed text-emerald-600 text-xl mb-1"></i>
+                                    <p class="text-sm font-medium text-gray-700">${l.beds} beds</p>
+                                </div>
+                                <div class="text-center">
+                                    <i class="fas fa-bath text-emerald-600 text-xl mb-1"></i>
+                                    <p class="text-sm font-medium text-gray-700">${l.baths} baths</p>
+                                </div>
+                            </div>
+
+                            <!-- Description -->
+                            <div>
+                                <h3 class="font-bold text-gray-800 mb-2">About this space</h3>
+                                <p class="text-gray-600 leading-relaxed">${l.description}</p>
+                            </div>
+
+                            <!-- Amenities -->
+                            <div>
+                                <h3 class="font-bold text-gray-800 mb-3">Amenities</h3>
+                                <div class="flex flex-wrap gap-2">
+                                    ${l.amenities.map(a => Components.AmenityTag(a)).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Contact Actions -->
+                            <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-100 max-w-[480px] mx-auto" style="padding-bottom: calc(1rem + env(safe-area-inset-bottom))">
+                                <div class="flex gap-3">
+                                    <a href="tel:${l.phone}" class="flex-1 bg-emerald-600 text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200">
+                                        <i class="fas fa-phone"></i>
+                                        Call Host
+                                    </a>
+                                    <a href="https://wa.me/${l.whatsapp}?text=Hi, I'm interested in your listing: ${encodeURIComponent(l.title)}" 
+                                       target="_blank"
+                                       class="flex-1 bg-green-500 text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-green-600 transition-colors shadow-lg shadow-green-200">
+                                        <i class="fab fa-whatsapp text-xl"></i>
+                                        WhatsApp
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            },
+
+            addSpace: () => {
+                return `
+                    ${Components.Header('List Your Space', true)}
+                    
+                    <div class="px-4 py-6 content-pb space-y-6">
+                        <!-- Photos -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Photos</label>
+                            <div class="image-upload-area rounded-2xl p-8 text-center cursor-pointer" onclick="document.getElementById('photoInput').click()">
+                                <i class="fas fa-cloud-upload-alt text-4xl text-gray-300 mb-2"></i>
+                                <p class="text-gray-500 text-sm">Tap to upload photos</p>
+                                <input type="file" id="photoInput" multiple accept="image/*" class="hidden" onchange="handlePhotoUpload(this)">
+                            </div>
+                            <div id="photoPreview" class="flex gap-2 mt-3 overflow-x-auto hide-scrollbar"></div>
+                        </div>
+
+                        <!-- Title -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Title</label>
+                            <input type="text" id="listingTitle" placeholder="e.g., Cozy Apartment in Port Moresby" 
+                                   class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                        </div>
+
+                        <!-- Type -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Property Type</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                ${['Home', 'Apartment', 'Lodge', 'Inn', 'Other'].map(type => `
+                                    <button type="button" onclick="selectType('${type}')" 
+                                            class="type-btn py-3 px-2 border border-gray-200 rounded-xl text-sm font-medium text-gray-600 hover:border-emerald-500 hover:text-emerald-600 transition-all"
+                                            data-type="${type}">
+                                        <i class="fas ${getTypeIcon(type)} block mb-1 text-lg"></i>
+                                        ${type}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Location -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+                            <div class="relative">
+                                <i class="fas fa-map-marker-alt absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                                <input type="text" id="listingLocation" placeholder="City or Area in PNG" 
+                                       class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+
+                        <!-- Price -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Price per Night (K)</label>
+                            <div class="relative">
+                                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">K</span>
+                                <input type="number" id="listingPrice" placeholder="0" 
+                                       class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500">
+                            </div>
+                        </div>
+
+                        <!-- Capacity -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Guests</label>
+                                <input type="number" id="guests" min="1" value="2" 
+                                       class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-center">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Beds</label>
+                                <input type="number" id="beds" min="1" value="1" 
+                                       class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-center">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Baths</label>
+                                <input type="number" id="baths" min="1" value="1" 
+                                       class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-center">
+                            </div>
+                        </div>
+
+                        <!-- Amenities -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Amenities</label>
+                            <div class="flex flex-wrap gap-2">
+                                ${['WiFi', 'AC', 'Kitchen', 'Parking', 'Garden', 'Pool', 'Security'].map(amenity => `
+                                    <button type="button" onclick="toggleAmenity(this, '${amenity}')" 
+                                            class="amenity-chip px-4 py-2 border border-gray-200 rounded-full text-sm text-gray-600 hover:border-emerald-500 hover:text-emerald-600 transition-all">
+                                        ${amenity}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                            <textarea id="listingDescription" rows="4" placeholder="Describe your space..." 
+                                      class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 resize-none"></textarea>
+                        </div>
+
+                        <!-- Submit -->
+                        <button onclick="submitListing()" 
+                                class="w-full bg-emerald-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-emerald-700 transition-colors shadow-lg shadow-emerald-200 mb-8">
+                            List My Space
+                        </button>
+                    </div>
+                    
+                    ${Components.BottomNav()}
+                `;
+            },
+
+            profile: () => {
+                const listings = store.userRole === 'host' ? store.myListings : [];
+                
+                return `
+                    ${Components.Header('Profile')}
+                    
+                    <div class="content-pb">
+                        <!-- Profile Header -->
+                        <div class="bg-emerald-600 text-white p-6 pb-12">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center text-3xl font-bold border-2 border-white/30">
+                                    ${store.currentUser ? store.currentUser.charAt(0) : 'G'}
+                                </div>
+                                <div>
+                                    <h2 class="text-2xl font-bold">${store.currentUser || 'Guest User'}</h2>
+                                    <p class="text-emerald-100 flex items-center gap-1">
+                                        <i class="fas fa-shield-alt"></i>
+                                        ${store.userRole === 'host' ? 'Verified Host' : 'Traveler'}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-4 mt-6">
+                                <button onclick="toggleRole()" class="flex-1 bg-white/20 backdrop-blur-sm py-2 rounded-lg text-sm font-medium hover:bg-white/30 transition-colors">
+                                    Switch to ${store.userRole === 'guest' ? 'Host' : 'Guest'} Mode
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Stats Cards -->
+                        <div class="px-4 -mt-6">
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                                    <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">${store.userRole === 'host' ? 'Active Listings' : 'Saved'}</p>
+                                    <p class="text-2xl font-bold text-gray-800">${store.userRole === 'host' ? listings.length : '0'}</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                                    <p class="text-gray-400 text-xs font-medium uppercase tracking-wider mb-1">${store.userRole === 'host' ? 'Total Views' : 'Trips'}</p>
+                                    <p class="text-2xl font-bold text-gray-800">0</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Menu -->
+                        <div class="px-4 py-6 space-y-2">
+                            <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+                                <button class="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center text-emerald-600">
+                                            <i class="fas fa-user-edit"></i>
+                                        </div>
+                                        <span class="font-medium text-gray-700">Edit Profile</span>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-gray-300"></i>
+                                </button>
+                                
+                                <button class="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center text-blue-600">
+                                            <i class="fas fa-bell"></i>
+                                        </div>
+                                        <span class="font-medium text-gray-700">Notifications</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                                        <i class="fas fa-chevron-right text-gray-300"></i>
+                                    </div>
+                                </button>
+                                
+                                <button class="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 bg-purple-50 rounded-full flex items-center justify-center text-purple-600">
+                                            <i class="fas fa-cog"></i>
+                                        </div>
+                                        <span class="font-medium text-gray-700">Settings</span>
+                                    </div>
+                                    <i class="fas fa-chevron-right text-gray-300"></i>
+                                </button>
+                            </div>
+
+                            ${store.userRole === 'host' ? `
+                                <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 mt-4">
+                                    <button onclick="navigateTo('add')" class="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors text-emerald-600">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-10 h-10 bg-emerald-50 rounded-full flex items-center justify-center">
+                                                <i class="fas fa-plus"></i>
+                                            </div>
+                                            <span class="font-medium">Add New Listing</span>
+                                        </div>
+                                        <i class="fas fa-chevron-right text-emerald-300"></i>
+                                    </button>
+                                </div>
+                            ` : ''}
+
+                            <button class="w-full mt-6 p-4 text-red-500 font-medium text-center hover:bg-red-50 rounded-2xl transition-colors">
+                                Log Out
+                            </button>
+                        </div>
+                    </div>
+                    
+                    ${Components.BottomNav()}
+                `;
+            },
+
+            saved: () => `
+                ${Components.Header('Saved')}
+                <div class="flex flex-col items-center justify-center h-[60vh] text-gray-400">
+                    <i class="far fa-heart text-6xl mb-4 text-gray-200"></i>
+                    <p class="text-lg font-medium text-gray-500">No saved listings yet</p>
+                    <p class="text-sm mt-1">Properties you save will appear here</p>
+                    <button onclick="navigateTo('home')" class="mt-6 px-6 py-3 bg-emerald-600 text-white rounded-xl font-medium hover:bg-emerald-700 transition-colors">
+                        Start Browsing
+                    </button>
+                </div>
+                ${Components.BottomNav()}
+            `,
+
+            trips: () => `
+                ${Components.Header('My Trips')}
+                <div class="flex flex-col items-center justify-center h-[60vh] text-gray-400">
+                    <i class="fas fa-suitcase text-6xl mb-4 text-gray-200"></i>
+                    <p class="text-lg font-medium text-gray-500">No trips yet</p>
+                    <p class="text-sm mt-1">Your upcoming stays will appear here</p>
+                </div>
+                ${Components.BottomNav()}
+            `,
+
+            analytics: () => `
+                ${Components.Header('Statistics')}
+                <div class="px-4 py-6 content-pb space-y-6">
+                    <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl p-6 text-white">
+                        <p class="text-emerald-100 text-sm font-medium mb-1">Total Earnings</p>
+                        <p class="text-4xl font-bold">K0.00</p>
+                        <p class="text-emerald-100 text-sm mt-2">This month</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                            <p class="text-gray-400 text-xs uppercase tracking-wider mb-1">Views</p>
+                            <p class="text-2xl font-bold text-gray-800">0</p>
+                        </div>
+                        <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm">
+                            <p class="text-gray-400 text-xs uppercase tracking-wider mb-1">Inquiries</p>
+                            <p class="text-2xl font-bold text-gray-800">0</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
+                        <h3 class="font-bold text-gray-800 mb-4">Performance Tips</h3>
+                        <ul class="space-y-3 text-sm text-gray-600">
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-emerald-500 mt-0.5"></i>
+                                <span>Add more photos to increase views by 40%</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-emerald-500 mt-0.5"></i>
+                                <span>Respond to inquiries within 1 hour</span>
+                            </li>
+                            <li class="flex items-start gap-2">
+                                <i class="fas fa-check-circle text-emerald-500 mt-0.5"></i>
+                                <span>Keep your calendar up to date</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                ${Components.BottomNav()}
+            `
+        };
+
+        // Actions
+        window.navigateTo = (screen) => {
+            if (screen === 'add' && store.userRole === 'guest') {
+                // Switch to host mode first
+                store.userRole = 'host';
+            }
+            store.currentScreen = screen;
+            render();
+        };
+
+        window.goBack = () => {
+            store.currentScreen = 'home';
+            store.selectedListing = null;
+            render();
+        };
+
+        window.viewListing = (id) => {
+            store.selectedListing = store.listings.find(l => l.id === id);
+            store.currentScreen = 'listingDetail';
+            render();
+        };
+
+        window.toggleRole = () => {
+            store.userRole = store.userRole === 'guest' ? 'host' : 'guest';
+            store.currentScreen = 'home';
+            render();
+        };
+
+        window.setFilter = (key, value) => {
+            store.filters[key] = value;
+            render();
+        };
+
+        window.toggleSave = (id) => {
+            // Animation feedback
+            event.target.classList.toggle('far');
+            event.target.classList.toggle('fas');
+            event.target.classList.toggle('text-red-500');
+        };
+
+        // Form handling
+        let selectedAmenities = [];
+        let selectedType = '';
+        let uploadedPhotos = [];
+
+        window.selectType = (type) => {
+            selectedType = type;
+            document.querySelectorAll('.type-btn').forEach(btn => {
+                if (btn.dataset.type === type) {
+                    btn.classList.add('border-emerald-500', 'text-emerald-600', 'bg-emerald-50');
+                    btn.classList.remove('border-gray-200', 'text-gray-600');
+                } else {
+                    btn.classList.remove('border-emerald-500', 'text-emerald-600', 'bg-emerald-50');
+                    btn.classList.add('border-gray-200', 'text-gray-600');
+                }
+            });
+        };
+
+        window.toggleAmenity = (btn, amenity) => {
+            if (selectedAmenities.includes(amenity)) {
+                selectedAmenities = selectedAmenities.filter(a => a !== amenity);
+                btn.classList.remove('bg-emerald-50', 'border-emerald-500', 'text-emerald-600');
+                btn.classList.add('border-gray-200', 'text-gray-600');
+            } else {
+                selectedAmenities.push(amenity);
+                btn.classList.add('bg-emerald-50', 'border-emerald-500', 'text-emerald-600');
+                btn.classList.remove('border-gray-200', 'text-gray-600');
+            }
+        };
+
+        window.handlePhotoUpload = (input) => {
+            const files = Array.from(input.files);
+            const preview = document.getElementById('photoPreview');
+            
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    uploadedPhotos.push(e.target.result);
+                    const img = document.createElement('div');
+                    img.className = 'flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden relative';
+                    img.innerHTML = `
+                        <img src="${e.target.result}" class="w-full h-full object-cover">
+                        <button onclick="removePhoto(this)" class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    preview.appendChild(img);
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+
+        window.removePhoto = (btn) => {
+            btn.parentElement.remove();
+        };
+
+        window.submitListing = () => {
+            const title = document.getElementById('listingTitle').value;
+            const location = document.getElementById('listingLocation').value;
+            const price = parseInt(document.getElementById('listingPrice').value) || 0;
+            const description = document.getElementById('listingDescription').value;
+            const guests = parseInt(document.getElementById('guests').value) || 1;
+            const beds = parseInt(document.getElementById('beds').value) || 1;
+            const baths = parseInt(document.getElementById('baths').value) || 1;
+
+            if (!title || !location || !price || !selectedType) {
+                alert('Please fill in all required fields');
+                return;
+            }
+
+            const newListing = {
+                id: Date.now(),
+                title,
+                type: selectedType,
+                price,
+                location,
+                image: uploadedPhotos[0] || 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=800&auto=format&fit=crop',
+                host: store.currentUser || 'You',
+                phone: '+675 7000 0000',
+                whatsapp: '67570000000',
+                rating: 0,
+                reviews: 0,
+                amenities: selectedAmenities,
+                description,
+                beds,
+                baths,
+                guests,
+                available: true
+            };
+
+            store.listings.unshift(newListing);
+            store.myListings.push(newListing);
+            
+            // Reset form
+            selectedAmenities = [];
+            selectedType = '';
+            uploadedPhotos = [];
+            
+            alert('Listing created successfully!');
+            navigateTo('home');
+        };
+
+        // Render function
+        function render() {
+            const app = document.getElementById('app');
+            const screen = Screens[store.currentScreen];
+            
+            if (screen) {
+                app.innerHTML = screen();
+                
+                // Add animation classes
+                const mainContent = app.querySelector('.content-pb') || app.firstElementChild;
+                if (mainContent) {
+                    mainContent.classList.add('fade-in');
+                }
+            }
+        }
+
+        // Initialize
+        render();
+    </script>
+</body>
+</html>
