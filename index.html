@@ -416,12 +416,10 @@
                 const totalBookings = store.myListings.reduce((sum, l) => sum + (l.bookings || 0), 0);
                 const activeListings = store.myListings.filter(l => l.status === 'active').length;
 
+                const rightAction = '<button onclick="navigateTo(\'add\')" class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 hover:bg-emerald-200 transition-colors"><i class="fas fa-plus"></i></button>';
+
                 return `
-                    ${Components.Header('Host Dashboard', false, `
-                        <button onclick="navigateTo('add')" class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 hover:bg-emerald-200 transition-colors">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    `)}
+                    ${Components.Header('Host Dashboard', false, rightAction)}
                     
                     <div class="content-pb px-4 py-6 space-y-6">
                         <!-- Welcome -->
@@ -550,12 +548,10 @@
 
             // NEW MY LISTINGS SCREEN
             myListings: () => {
+                const rightAction = '<button onclick="navigateTo(\'add\')" class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 hover:bg-emerald-200 transition-colors"><i class="fas fa-plus"></i></button>';
+
                 return `
-                    ${Components.Header('My Listings', false, `
-                        <button onclick="navigateTo('add')" class="w-10 h-10 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600 hover:bg-emerald-200 transition-colors">
-                            <i class="fas fa-plus"></i>
-                        </button>
-                    `)}
+                    ${Components.Header('My Listings', false, rightAction)}
                     
                     <div class="px-4 py-4 content-pb">
                         <!-- Filter Tabs -->
